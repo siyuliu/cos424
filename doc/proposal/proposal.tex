@@ -30,21 +30,61 @@ Siyu Liu\\
 
 \section{Introduction}
 
-In computer vision, image segmentation is a process of partitioning an image into several pixel groups. The pixels in each group should have something in common, such as color, intensity or texture. The goal of image segmentation is to change the representation of an image into something meaningful and easy to understand. Image segmentation is one of the oldest and most widely studied problems. It is typically used to locate objects and boundaries in an image. An interesting application of image segmentation is to track facial features or objects of significance in a performance-driven animation. This helps to better compress the animation without loss of important information.
+In computer vision, image segmentation is a process of partitioning an 
+image into several pixel groups. The pixels in each group should have 
+something in common, such as color, intensity or texture. The goal
+ of image segmentation is to change the representation of an image into
+ something meaningful and easy to understand. It is typically
+ used to locate objects and boundaries in an image. An interesting 
+application of image segmentation is to track facial features or objects
+ of significance in a performance-driven animation. This helps to 
+better compress the animation without loss of important information.
 
-Particularly, how to partition an image into two segments: ``foreground'' and ``background'' is of special interest. Earlier techniques focused on finding the boundary curves between the objects and background. The algorithms include snakes~\citep{Kass1988snakes}, active contours~\citep{Isard1998condensation}, geodesic active contours~\citep{Caselles1995geodesic} and so on. A recent new approach by~\citet{Boykov2006graph} demonstrates a great potential for solving this problem. The approach replies on some manual sketchy on the original image. To be specific, a user draws a few red strokes in the foreground objects and a few blue ones in the background. Therefore, the algorithm gets some extra information about the background and foreground before doing image segmentation. Though the strokes might not be quite accurate, yet it indeed provides some useful information.   
+Particularly, how to partition an image into two segments: ``foreground''
+ and ``background'' is of special interest. Earlier techniques focused 
+on finding the boundary curves between the objects and background. 
+The algorithms include snakes~\citep{Kass1988snakes}, active 
+contours~\citep{Isard1998condensation}, geodesic active
+ contours~\citep{Caselles1995geodesic} and so on. A recent new approach 
+by~\citet{Boykov2006graph} demonstrates new potential for solving 
+this problem. The approach relies on some manual sketchy on the original
+ image. To be specific, a user draws a few red strokes in the foreground 
+objects and a few blue ones in the background. Therefore, the algorithm
+solves image segmentation based on some extra knowledge about the
+ background and foreground. However, one obvious problem with this approach 
+is that it requires additional manual efforts, which limits the number 
+of images that can be processed. Moreover, as the strokes are roughly
+drawn, it introduces some uncertain errors when the boundary between 
+``foreground'' and ``background'' is not quite distingushiable.
 
+In this project, we propose a new approach to partition ``foreground''
+and ``background'' based on distance data about real objects in the image.
+For each image to be processed, we have additional data telling the 
+distances between the camera and the objects in real corresponding to some
+ pixels in the image. To be specific, when an image is taken by camera, 
+there is a one-to-one mapping from pixels in the image to real objects. 
+And the additional data tells distance between camera and some real objects 
+corresponding to certain pixels in the image. Therefore, we have some 
+prior knowledge about how far are some pixels in the image to the camera.
 
+The information can help us analyze whether a pixel belongs to ``foreground'' 
+or ``background''. But this information is not complete, as it only covers 
+very few pixels. Moreover, it may contain some errors. For example, some pixel
+may be mapped to a wrong real object resulting in a wrong distance number.
+As the distance data is not quite reliable, we plan to only use it to generate 
+the initial states of pixels, i.e, whether it belongs to ``foreground'' or not.
+Based on the inital states, we'll iteratively refine the segmentation following 
+the traditional Expectation Maximization process. To do the refinement, we'll 
+use Markov Random Fields to calculate the log-likelihood of a pixel, taking the
+information of the 8 pixels around it into account.
 
-
-
-There are snakes (Kass et al., 1988; Cohen, 1991), active contours (Isard and Blake, 1998), geodesic active contours (Caselles et al., 1997; Yezzi et al., 1997), “shortest path” tech- niques (Mortensen and Barrett, 1998; Falca ̃o et al., 1998) and many other examples of methods for par- titioning an image into two segments: “object” and “background”. 
-
-The result of image segmentation is either a set of segments that cover the whole image, or a set of contours which separate the segments.
-
-Image segmentation has many useful applications. For example, 
-
- Earlier techniques include algorithm based active contours, region splitting and merging, and mean shift.
+We believe our approach is more accurate than previous work. The additional 
+distance data is a good indicator about the which group a pixel belongs to, 
+thus giving us confidence in the accuracy of segmentation, compared to earlier
+ techniques which only use the image information alone. Moreover, our approach is 
+flexible in that it does not need manual annotation. Finally, the approach
+is not likely to be misled by the errors in distance data, since it will do 
+iterative refinement based on the pixel's local neighbor information.
 
 
 
@@ -119,7 +159,7 @@ Figure~\ref{fig-graphical_model}.
 
 
 \section{Evaluation}
-
+As explained before, the goal for this project is to separate the forground from background in street view images. However, provided ground truth is not available in our dataset, directly measuring the error seems not feasible (though we can measure the enery in the resulting MRF but it might not corresponding to the optimal behaviors as pointed out in \ref{Szeliski2008Comparative}). Thus, we plan to do a series of comparative expriments with current interactive methods mentioned in \ref{Szeliski2008Comparative}. Although modern MRF-based segmentation algorithms performs reasonably well, human facilitations during the process might be less favored in large dataset such as the street view dataset. Therefore,  by taking advantage of the LiDAR inputs, we are hoping to use sparse depth information as guidence to develop an automatic alternative yet competitive approach for binary image segmentation task. If our algorithm works as our optimistic estimation, we would attempt to generalize it into segmentation for multiple objects upon which we could further use these segments for image matching and possibly build models for 3D meshes for different objects accordingly. On the other hand, if the proposed method could not meet our expectation, we would like to explore the possibilities of reorganizing our lidar data as proper inputs for the interactive methods as in \ref{Rother2004GrabCut} and \ref{Arbelaez2011Contour}.
 
 \bibliography{proposal}
 \bibliographystyle{abbrvnat}
