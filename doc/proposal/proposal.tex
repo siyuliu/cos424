@@ -129,6 +129,22 @@ computing issue will be discussed in the methods section.
 
 \section{Methods}
 
+We propose to formulate the background and foreground separation
+problem as labeling problem. We assign each pixel a binary latent
+variable representing the category of the pixel. For each
+segmentation (foreground or background), we plan to use Gaussian Mixture Model to model the
+distribution of the colors. If the distribution of the pixel colors
+are independent, we can use the mixture model together with EM
+(Expectation-Maximization) algorithm to solve the assignment of labels
+directly. However, this method would not work well because we would
+get very noisy label assignment to the pixels. The essential problem
+is that there is interaction between adjacent pixels. If all the
+neighbors of a pixel are labeled foreground, it is more possible that
+this pixel also belongs to foreground. We plan to
+use MRF(Markov Random Field) to model this idea. As mentioned in
+introduction, this model is widely used by a lot of works. A good
+survey is in~\citep{Szeliski2008Comparative}.
+
 \section{Evaluation}
 
 
