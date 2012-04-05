@@ -29,7 +29,25 @@ Siyu Liu\\
 \maketitle
 
 \section{Introduction}
-refer~\citet{Besag74}
+
+In computer vision, image segmentation is a process of partitioning an image into several pixel groups. The pixels in each group should have something in common, such as color, intensity or texture. The goal of image segmentation is to change the representation of an image into something meaningful and easy to understand. Image segmentation is one of the oldest and most widely studied problems. It is typically used to locate objects and boundaries in an image. An interesting application of image segmentation is to track facial features or objects of significance in a performance-driven animation. This helps to better compress the animation without loss of important information.
+
+Particularly, how to partition an image into two segments: ``foreground'' and ``background'' is of special interest. Earlier techniques focused on finding the boundary curves between the objects and background. The algorithms include snakes~\citep{Kass1988snakes}, active contours~\citep{Isard1998condensation}, geodesic active contours~\citep{Caselles1995geodesic} and so on. A recent new approach by~\citet{Boykov2006graph} demonstrates a great potential for solving this problem. The approach replies on some manual sketchy on the original image. To be specific, a user draws a few red strokes in the foreground objects and a few blue ones in the background. Therefore, the algorithm gets some extra information about the background and foreground before doing image segmentation. Though the strokes might not be quite accurate, yet it indeed provides some useful information.   
+
+
+
+
+
+There are snakes (Kass et al., 1988; Cohen, 1991), active contours (Isard and Blake, 1998), geodesic active contours (Caselles et al., 1997; Yezzi et al., 1997), “shortest path” tech- niques (Mortensen and Barrett, 1998; Falca ̃o et al., 1998) and many other examples of methods for par- titioning an image into two segments: “object” and “background”. 
+
+The result of image segmentation is either a set of segments that cover the whole image, or a set of contours which separate the segments.
+
+Image segmentation has many useful applications. For example, 
+
+ Earlier techniques include algorithm based active contours, region splitting and merging, and mean shift.
+
+
+
 \section{Data}
 We got our data from Google street view team and processed it to use
 the images in our project. The data was collected by a car equiped
