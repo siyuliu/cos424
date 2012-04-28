@@ -52,9 +52,10 @@ int main (int argc, char** argv)
   //threshold(dist_image, dist_image, 0.1, 1, THRESH_BINARY);
 
   string window_name = "distance transform";
-  namedWindow(window_name, CV_WINDOW_NORMAL);
+  /*namedWindow(window_name, CV_WINDOW_NORMAL);
   imshow(window_name, dist_image);
-  waitKey();
+  waitKey();*/
+  imwrite("dt.jpg", dist_image * 255);
 
   return 0;
 }
