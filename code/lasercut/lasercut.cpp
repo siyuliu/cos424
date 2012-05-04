@@ -562,7 +562,7 @@ void lasercut(InputArray _img, InputOutputArray _mask, Rect rect,
 
     const double gamma = 50;
     const double lambda = 9*gamma;
-    const double beta = calcBeta( img );
+    const double beta = 0; //calcBeta( img );
 
     Mat leftW, upleftW, upW, uprightW;
     calcNWeights( img, leftW, upleftW, upW, uprightW, beta, gamma );
