@@ -316,6 +316,57 @@ void calcNWeights( const Mat& img, Mat& leftW, Mat& upleftW, Mat& upW, Mat& upri
     }
 }
 
+void calcNWeights( const Mat& img, const Mat& dist_img,
+                   Mat& leftW, Mat& upleftW, Mat& upW, Mat& uprightW,
+                   double beta, double gamma )
+{
+    const double gammaDivSqrt2 = gamma / std::sqrt(2.0f);
+    leftW.create( img.rows, img.cols, CV_64FC1 );
+    upleftW.create( img.rows, img.cols, CV_64FC1 );
+    upW.create( img.rows, img.cols, CV_64FC1 );
+    uprightW.create( img.rows, img.cols, CV_64FC1 );
+    for( int y = 0; y < img.rows; y++ )
+    {
+        for( int x = 0; x < img.cols; x++ )
+        {
+            Vec3d color = img.at<Vec3b>(y,x);
+            double beta_dist;
+            if (dist_img.type() == CV_32FC1)
+              beta_dist = beta * dist_img.at<float>(y, x);
+            else
+              beta_dist = beta * dist_img.at<double>(y, x);
+            if( x-1>=0 ) // left
+            {
+                Vec3d diff = color - (Vec3d)img.at<Vec3b>(y,x-1);
+                leftW.at<double>(y,x) = gamma * exp(-beta_dist*diff.dot(diff));
+            }
+            else
+                leftW.at<double>(y,x) = 0;
+            if( x-1>=0 && y-1>=0 ) // upleft
+            {
+                Vec3d diff = color - (Vec3d)img.at<Vec3b>(y-1,x-1);
+                upleftW.at<double>(y,x) = gammaDivSqrt2 * exp(-beta_dist*diff.dot(diff));
+            }
+            else
+                upleftW.at<double>(y,x) = 0;
+            if( y-1>=0 ) // up
+            {
+                Vec3d diff = color - (Vec3d)img.at<Vec3b>(y-1,x);
+                upW.at<double>(y,x) = gamma * exp(-beta_dist*diff.dot(diff));
+            }
+            else
+                upW.at<double>(y,x) = 0;
+            if( x+1<img.cols-1 && y-1>=0 ) // upright
+            {
+                Vec3d diff = color - (Vec3d)img.at<Vec3b>(y-1,x+1);
+                uprightW.at<double>(y,x) = gammaDivSqrt2 * exp(-beta_dist*diff.dot(diff));
+            }
+            else
+                uprightW.at<double>(y,x) = 0;
+        }
+    }
+}
+
 /*
   Check size, type and element values of mask matrix.
  */
@@ -577,4 +628,62 @@ void lasercut(InputArray _img, InputOutputArray _mask, Rect rect,
     }
 }
 
+void lasercut(InputArray _img, InputArray _dist_img,
+              InputOutputArray _mask, Rect rect,
+              InputOutputArray _bgdModel, InputOutputArray _fgdModel,
+              int iterCount, int mode )
+{
+    Mat img = _img.getMat();
+    Mat dist_img = _dist_img.getMat();
+    Mat& mask = _mask.getMatRef();
+    Mat& bgdModel = _bgdModel.getMatRef();
+    Mat& fgdModel = _fgdModel.getMatRef();
+    
+    if( img.empty() )
+      CV_Error( CV_StsBadArg, "image is empty" );
+    if (dist_img.empty())
+      CV_Error(CV_StsBadArg, "dist image is empty");
+    if( img.type() != CV_8UC3 )
+      CV_Error( CV_StsBadArg, "image mush have CV_8UC3 type" );
+    if (dist_img.type() != CV_32FC1 && dist_img.type() != CV_64FC1)
+      CV_Error(CV_StsBadArg, "dist image must have float type");
+    if (img.size() !=  dist_img.size())
+      CV_Error(CV_StsBadArg,
+               "image and dist image should have the same size");
+
+    GMM bgdGMM( bgdModel ), fgdGMM( fgdModel );
+    Mat compIdxs( img.size(), CV_32SC1 );
+
+    if( mode == GC_INIT_WITH_RECT || mode == GC_INIT_WITH_MASK )
+    {
+        if( mode == GC_INIT_WITH_RECT )
+            initMaskWithRect( mask, img.size(), rect );
+        else // flag == GC_INIT_WITH_MASK
+            checkMask( img, mask );
+        initGMMs( img, mask, bgdGMM, fgdGMM );
+    }
+
+    if( iterCount <= 0)
+        return;
+
+    if( mode == GC_EVAL )
+        checkMask( img, mask );
+
+    const double gamma = 50;
+    const double lambda = 9*gamma;
+    const double beta = calcBeta( img );
+
+    Mat leftW, upleftW, upW, uprightW;
+    calcNWeights( img, dist_img, leftW, upleftW, upW, uprightW, beta, gamma );
+
+    for( int i = 0; i < iterCount; i++ )
+    {
+        GCGraph<double> graph;
+        assignGMMsComponents( img, mask, bgdGMM, fgdGMM, compIdxs );
+        learnGMMs( img, mask, compIdxs, bgdGMM, fgdGMM );
+        constructGCGraph(img, mask, bgdGMM, fgdGMM, lambda, leftW, upleftW, upW, uprightW, graph );
+        estimateSegmentation( graph, mask );
+    }
 }
+
+} // furry

@@ -2,11 +2,16 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <gflags/gflags.h>
 
 using namespace std;
 using namespace cv;
 
 const Size image_size(1936, 2592);
+
+DEFINE_string(points_file_name, NULL,
+              "the file path containing points");
+
 
 int main(int argc, char** argv)
 {

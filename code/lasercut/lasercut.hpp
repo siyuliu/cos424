@@ -30,6 +30,11 @@ void lasercut(cv::InputArray img, cv::InputOutputArray mask, cv::Rect rect,
               cv::InputOutputArray bgdModel, cv::InputOutputArray fgdModel,
               int iterCount, int mode = LC_EVAL );
 
+void lasercut(cv::InputArray img, cv::InputArray dist_img,
+              cv::InputOutputArray mask, cv::Rect rect,
+              cv::InputOutputArray bgdModel, cv::InputOutputArray fgdModel,
+              int iterCount, int mode = LC_EVAL );
+
 } // furry
 
 #endif
