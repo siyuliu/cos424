@@ -47,8 +47,8 @@ int main(int argc, char** argv)
   {
     if (it->y >= 0 && it->y < image_size.height &&
         it->x >= 0 && it->x < image_size.width)
-      point_image.at<double>(it->y / sample_ratio + 0.5,
-                             it->x / sample_ratio + 0.5) = 1;
+      point_image.at<double>(it->y / sample_ratio + 0,
+                             it->x / sample_ratio + 0) = 1;
   }
 
   Mat sobel_x_image, sobel_y_image;
@@ -67,8 +67,9 @@ int main(int argc, char** argv)
   sqrt(sobel_x_image.mul(sobel_x_image) + sobel_y_image.mul(sobel_x_image),
        sobel_image_s);
   Mat sobel_image;
+  GaussianBlur(point_image, sobel_image_s, Size(3, 3), 0);
   resize(sobel_image_s, sobel_image, image_size, 0, 0, INTER_AREA);
-  GaussianBlur(sobel_image, sobel_image, Size(7, 7), 0);
+  //GaussianBlur(sobel_image, sobel_image, Size(5, 5), 0);
   minMaxLoc(sobel_image, 0, &max_value);
   cout << "sobel max value: " << max_value << endl;
   cout << "sobel image size: " << sobel_image.size().width << " "

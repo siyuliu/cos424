@@ -42,6 +42,7 @@
 #include "precomp.hpp"
 #include "lcgraph.hpp"
 #include <limits>
+#include <gflags/gflags.h>
 
 using namespace cv;
 
@@ -576,6 +577,9 @@ void estimateSegmentation( GCGraph<double>& graph, Mat& mask )
     }
 }
 
+DEFINE_double(lc_gamma, 50,
+              "gamma in laser cut");
+
 namespace furry
 {
 
@@ -613,7 +617,7 @@ void lasercut(InputArray _img, InputOutputArray _mask, Rect rect,
 
     const double gamma = 50;
     const double lambda = 9*gamma;
-    const double beta = 0; //calcBeta( img );
+    const double beta = calcBeta( img );
 
     Mat leftW, upleftW, upW, uprightW;
     calcNWeights( img, leftW, upleftW, upW, uprightW, beta, gamma );
@@ -669,7 +673,7 @@ void lasercut(InputArray _img, InputArray _dist_img,
     if( mode == GC_EVAL )
         checkMask( img, mask );
 
-    const double gamma = 50;
+    const double gamma = FLAGS_lc_gamma;
     const double lambda = 9*gamma;
     const double beta = calcBeta( img );
 

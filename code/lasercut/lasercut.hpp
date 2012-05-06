@@ -2,6 +2,9 @@
 #define _FURRY_LASER_CUT_
 
 #include <opencv2/core/core.hpp>
+#include <gflags/gflags.h>
+
+//DECLARE_double(lc_gamma);
 
 namespace furry
 {

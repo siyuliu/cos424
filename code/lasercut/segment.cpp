@@ -24,7 +24,7 @@ int main (int argc, char** argv)
   google::SetUsageMessage("");
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  cout << "version: 8\n";
+  cout << "version: 10\n";
 
   auto image = imread(FLAGS_data_path + "/" + FLAGS_image_name);
   auto dt_image = imread(FLAGS_data_path + "/" + FLAGS_dt_image_name, 0);
@@ -38,7 +38,7 @@ int main (int argc, char** argv)
   imshow("sobel", dist_image);
   waitKey(0);*/
   //dist_image = dist_image;
-  //dist_image = Mat::ones(dist_image.size(), CV_64F);
+  dist_image = Mat::zeros(dist_image.size(), CV_64F);
 
   Mat mask(image.size(), CV_8UC1);
   // Mark probably background with 0 and probably forground with 1
@@ -79,6 +79,9 @@ int main (int argc, char** argv)
   //cvtColor(mask, mask_rgb, CV_GRAY2BGR);
   //mask_rgb *= 255;
   addWeighted(image, 0.5, mask_rgb, 0.5, 0.0, overlay);
+
+  imwrite("overlay.jpg", overlay);
+
   string window_name = "mask";
   namedWindow(window_name, CV_WINDOW_NORMAL);
   imshow(window_name, overlay);
