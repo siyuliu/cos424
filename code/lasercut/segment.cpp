@@ -38,7 +38,7 @@ int main (int argc, char** argv)
   imshow("sobel", dist_image);
   waitKey(0);*/
   //dist_image = dist_image;
-  dist_image = Mat::zeros(dist_image.size(), CV_64F);
+  dist_image = Mat::ones(dist_image.size(), CV_64F);
 
   Mat mask(image.size(), CV_8UC1);
   // Mark probably background with 0 and probably forground with 1
