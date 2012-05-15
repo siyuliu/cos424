@@ -265,10 +265,10 @@ pixel labels at the end of each EM iteration.
 As you can see in Figure~\ref{fig-data_image}, the scan points are not
 scattered in the image evenly in the foreground and therefore it is
 hard to extract some robust statistics to describe the foreground or
-the boundary. One idea is using bins around a pixel to describe the
-feature of it. To be specific, given the position of a pixel, we
-consider all the scan points within certain radius. The circle is
-divided in angular direction to get the bins. Then the feature of the
+the boundary. One idea is using bins around a pixel to describe its
+feature. To be specific, given the position of a pixel, we 
+consider all the scan points within certain radius. The circle is then
+divided in angular direction to get the bins. The feature value of the
 pixel is how many pizza shape bins contain scan points. Although it is
 a nice way to describe the scan point description around a pixel, it
 is hard to find efficient way to calculate it for every
