@@ -1,5 +1,5 @@
 \documentclass{article} % For LaTeX2e
-\usepackage{nips12submit_e,times}
+\usepackage{nips12submit_e,times, color}
 \usepackage{natbib}
 \usepackage[pdftex]{graphicx}
 %\documentstyle[nips12submit_09,times,art10]{article} % For LaTeX 2.09
@@ -30,6 +30,47 @@ Siyu Liu\\
 test citation~\citep{Boykov2006graph}
 
 \section{Introduction}
+{\color{red} General description here}
+\subsection{Motivation}
+\subsection{Data}
+We got our data from Google street view team and preprocessed it for
+use in our project. The data was collected by a car equiped
+with 8 cameras and 3 laser scanners. Each of the laser scanner can
+scan a 180 degree 2D plane at each time. Two of the laser scanners
+scanned vertically and the third one scanned horizontally. As the car moved, the car
+positions were recorded by global positioning system. Those positions
+were adjusted by the scans of the horizontal laser scanner using SLAM
+(Simultaneous localization and mapping) techniques to get the best
+precision. The 3D position of each laser scan point can be
+estimated based on the relative positions of the car and laser
+scanners and therefore a 3D point cloud can be built from the scans of
+the vertical laser scanners. At the same time, the eight
+cameras were taking pictures as the car moved. Although the cameras
+were well calibrated, the images were taken by rolling shutters and
+there could exist errors in terms of image projection model if we assume each
+image were taken in a pinhole model.
+
+Given the 3D point cloud and images, we project the points onto the
+images with the estimated point positions, camera poses and projection
+matrices. Then we can get images like Figure~\ref{fig-data_image}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=0.5\linewidth]{./fig/image_sample.png}
+\end{center}
+\caption{An image with 3D points projected into it.}
+\label{fig-data_image}
+\end{figure}
+
+In Figure~\ref{fig-data_image}, the black dots are the projections of
+the 3D points on this image. As we can see, due to all kinds of possible
+errors mentioned above, the 3D projections and the images are not well
+aligned and we can't segment the images directly based on the depth of
+the 3D scan points. In this project, we want to find the contour
+between the background (the sky area) and foreground (all the objects
+appears in the image, including roads and buildings). The models and
+computing issue will be discussed in the methods section.
+
 \section{Related Work}
 As a common problem in vision, segmentation has been well studied in the past. There is a large literature on segmentation and clustering among which two main lines of methods are proposed previously, feature space clustering (e.g.~\citep{Comaniciu1997featurespace},~\citep{Comaniciu1999meanshift}) and graph-based approach (e.g.~\citep{Shi1997normalizedcuts},~\citep{Wu1993optimalgraph}). 
 
@@ -42,6 +83,29 @@ Another branch of image segmentation algorithms is graph-based method. Instead o
 One naive approach would be to calcualte connected components. We could use algorithms like Kruskal or Prime to simple remove edges between dissimilar pixels. However, this method is not robust to stray links. Thus,~\citep{Felzenszwalb2004Efficient} introduced an improved version of Kruskal algorithm which takes in account the local variantion within each component. An alternative proposal is to formulate segmentation as a max-flow/min-cut problem. One typical example of S-T Min Cut algorithms is the normalized cut introduced by~\citep{Shi2000Normalized}. This method takes into account the partition size of each segment so as to avoid tiny regions. In a more sophesticated setting, Markov Random Field (MRF), which we chosed for this project, is often used to combine probabilistic modeling and graph cut in order to provide better result. The goal of learning MRFs is to minimize the objective function (a.k.a. the energy function) which describes both fitness and connectivity among neighborhood. Several training algorithms have been proposed over the years, Iterated Conditional Modes (ICM)~\citep{Besag1986statisticalanalysis} uses "greedy" strategy to find local minimum; Graph Cuts, two most popular ones, swap-move and expansion-move were introduced in~\citep{Boykov2001Fast}; Max-Product Loopy Belif Propagation (LBP)~\citep{Felzenszwalb2004Efficient} and~\citep{Freeman2000lowlevel}, a variant algorithm from the original belif propagation supporting loops in the graph; Tree-reweighted Message Passing desbribed in~\citep{Kolmogorov2006messagepassing}.
 
 \section{Methods}
+Based on the previous work, we merge several ideas in our
+project. First, to classify a pixel, we can first train a Gaussian
+mixture model to summarize the variation of pixels in the background
+and foreground separately. In another way to see this, we are getting
+an approximate distance from a certain pixel value to the cluster it
+belongs to and therefore we can get a cost to assign a certain pixel
+to the foreground or background. On the other hand, in the Gaussian
+mixture model, we are assigning an latent variable to each pixel. Due
+to the isolation between adjacent pixels in the Gaussian model, it is
+easy to imagine that the output of the binary classification will be
+very noisy in the sense that the adjacent pixels will have different
+labels although they have similar colors and belong to the same object
+visually. To solve this problem, we use Markov random field(MRF) model to
+constraint the relation between the labels of adjacent pixels. Also,
+we use conditional random field(CRF) model to adapt this relation to
+the difference of the pixel colors and therefore the model becomes
+more flexible. Also, we explore various ways to utilize our laser
+data. In the following subsections, we will discuss parts of our model
+and elaborate how we use the scan data.
+\subsection{Gaussian Mixture Model}
+\subsection{Conditional Random Field}
+\subsection{Inference}
+\subsection{Use of Scan Data}
 \section{Experiment}
 The first experiment is done using GrabCut. As mentioned in previous section, we only use the distance transform image derived from laser point projections as an initialization for MRF in this case. The distance transform image is thresholded to form an initial labeling strategy for foreground and background. As a result, the extra information provided is not used across iterations. The result is shown in figure []. 
 
