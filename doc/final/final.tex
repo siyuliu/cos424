@@ -27,9 +27,68 @@ Siyu Liu\\
 
 \maketitle
 
-test citation~\citep{Boykov2006graph}
+%test citation~\citep{Boykov2006graph}
 
 \section{Introduction}
+
+In computer vision, ``Image Segmentation'' is a process of partitioning an
+image into several pixel groups. It is typically used to locate
+objects and boundaries in an image. Particularly, ``Binary Separation'' -
+how to partition an image into two segments: ``foreground''
+ and ``background'' is of special interest. 
+
+% Earlier techniques focused on finding the boundary curves between the
+% objects and background. The algorithms include
+% snakes~\citep{Kass1988snakes}, active
+% contours~\citep{Isard1998condensation} and so on. A recent new
+% approach by~\citet{Boykov2006graph} relies on manual sketches on the
+% original image. 
+% It requires a user to draw strokes of different color in the
+% foreground and background area of the image. Then, the algorithm
+% solves segmentation problem based on this extra knowledge. However,
+% one obvious problem with this approach is that it requires
+% additional manual efforts, which limits the number of images that
+% can be processed. Moreover, as the strokes are roughly drawn, it
+% introduces some uncertain errors when the boundary is not quite
+% distingushiable.
+
+Earlier techniques are either based on boundary features
+~\citep{Kass1988snakes} or manual sketches
+~\citep{Boykov2006graph}. In this project, we propose a new
+approach to partition ``foreground'' and ``background'' making use of 
+distance data of real objects in the image. To be specific, when an
+image is taken by camera, there exists a
+one-to-one mapping from pixels in the image to real objects. 
+For each image to be processed, we have additional data telling the 
+distances between the camera and the real objects corresponding to some
+ pixels in the image. 
+
+It is challenging to use the distance data. Although the distance data
+is helpful, yet it is not complete. A typical distance data set only
+covers approximately 10\% pixels.It is necessary to develop techniques
+that infers the states of other pixels based on this sparse
+information. Besides, the data could contain some errors. For example,
+some pixel may be mapped to a wrong real object resulting in a wrong
+distance number. Therefore, the algorithm should include procedures
+that help fix the inherent errors of data. 
+
+Considering the defects of distance data, we plan to only use it to
+generate the initial states of pixels, i.e,
+ whether it belongs to ``foreground'' or not. Based on the inital
+ states, we'll iteratively refine the segmentation following the
+ traditional Expectation Maximization process. To do the refinement,
+ we'll use Markov Random Fields to calculate the log-likelihood of a
+ pixel, taking the information of the 8 pixels around it into account.
+
+We believe our approach is more accurate than previous work. The additional 
+distance data is a good indicator about which group a pixel belongs to, 
+thus giving us confidence in the accuracy of segmentation, compared to earlier
+ techniques which only use the image information alone. Moreover, our
+ approach is flexible in that it does not need manual annotation. Finally, the
+segmentation decision is not likely to be misled by errors in distance
+data, since it will do iterative refinement based on the pixel's local
+neighbor information.
+
 \section{Related Work}
 As a common problem in vision, segmentation has been well studied in the past. There is a large literature on segmentation and clustering among which two main lines of methods are proposed previously, feature space clustering (e.g.~\citep{Comaniciu1997featurespace},~\citep{Comaniciu1999meanshift}) and graph-based approach (e.g.~\citep{Shi1997normalizedcuts},~\citep{Wu1993optimalgraph}). 
 
