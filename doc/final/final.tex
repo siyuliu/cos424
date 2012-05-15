@@ -1,5 +1,5 @@
 \documentclass{article} % For LaTeX2e
-\usepackage{nips12submit_e,times, color}
+\usepackage{nips12submit_e,times, color, amsmath}
 \usepackage{natbib}
 \usepackage[pdftex]{graphicx}
 %\documentstyle[nips12submit_09,times,art10]{article} % For LaTeX 2.09
@@ -164,14 +164,74 @@ more flexible. Also, we explore various ways to utilize our laser
 data. In the following subsections, we will discuss parts of our model
 and elaborate how we use the scan data.
 \subsection{Gaussian Mixture Model}
-
+The foreground and background shall have different color
+characteristics. We use Gaussian Mixture Model to summarize the colors
+of background and foreground. We train the two models separately,
+which means given a estimate of foreground and background pixels, we
+don't change the label of the pixels and only aim to find a more
+accurate model to describe the given labels. We use standard EM
+algorithm to train the models.
 \subsection{Conditional Random Field}
+To solve the discontinuity problem in only using distance to the
+closest Gaussian mixture model as a cost, as what has been down in the
+literature, we add a connection cost between adjacent pixel labels to
+encourage identical labeling. Our proposed model is
+\begin{align}
+\mathbf{E}(\mathbf{c}, \mathbf{d},\mathbf{k}, \mathbf{\theta},
+\mathbf{z}) &= U(\mathbf{c},\mathbf{k}, \mathbf{\theta}, \mathbf{z}) +
+V(\mathbf{c}, \mathbf{d}, \mathbf{z}) \\
+U(\mathbf{c},\mathbf{k}, \mathbf{\theta}, \mathbf{z}) &=
+\sum_{i=0}^{i<N} D(c_i, k_i, \theta, z_i) \\
+D(c_i, k_i, \theta, z_i) &= -\log \pi_{k_i}^{z_i} + (c_i -
+\mu_{k_i}^{z_i})^T (\Sigma_{k_i}^{z_i})^{-1} (c_i - \mu_{k_i}^{z_i})
+\\
+V(\mathbf{c}, \mathbf{d}, \mathbf{z}) &= \gamma \sum_{(i, j) \in
+  \mathcal{N}} [z_i \not = z_j] e^{ -\beta d_i \| c_i - c_j\|^2}
+\end{align}
+\textbf{c} is the set of pixel colors.
+\textbf{d} is  how likely a given pixel is on the boundary from
+scan. It will be discussed further later in this section.
+\textbf{k} is assigned GMM cluster for each pixel.
+\textbf{z} is latent variables labeling foreground and background where $z=0$ means foreground and $z=1$ background.
+$\pi_k^z$ is mixture weighting coefficients.
+$\mu_k^z$ is the mean of the $k$th Gaussian component.
+$\Sigma_k^z$ is the covariance matrix of the $k$th Gaussian component.
+$\gamma$,$\beta$ are parameters to control the connection cost.
+$\theta$ is the set of parameters of the Gaussian mixture model and
+therefore $\theta$ = \{$\pi$, $\mu$, $\Sigma$\}.
+$\mathcal{N}$ is set of all the neighbor pixels and we don't use
+diagonal neighbor in the experiments. $N$ is the number of pixels in
+the image. $\mathbf{E}$ is the energy function representing the cost function we
+are going to minimize. It can be decomposed into two
+parts. $\mathbf{U}$ is the cost of unary term. As discussed in the
+last subsection, it is the Mahalanobis distance to the closest
+Gaussian cluster of its labeled Gaussian mixture model, adjusted by
+the mixture weighting coefficient of that cluster. Note that we didn't
+use soft assigned cluster in the model, as was done commonly in
+Gaussian mixture model.~\citet{Rother2004GrabCut} said that in their
+experiment, the soft assignment doesn't improve the results greatly
+but will make the optimization harder. $\mathbf{V}$ is the connection
+cost between adjacent pixels. The cost is adjusted by the additional
+information including the pixel color difference and the scan
+information. The idea is that if the color difference is large or the
+pixels are likely on the boundary of different segmentations, the
+inconsistent labeling cost will be small. Otherwise, if two adjacent
+pixels have very similar colors, they are more likely to have the same
+labeling. In our case, we consider the color image instead of gray
+image and so the different difference of pixel colors are measured by
+L2 norm.
 
+It is worth pointing out that when \textbf{d} is always 1. The model is
+called GrabCut as in~\citep{Rother2004GrabCut}. When $\beta$ is 0,
+which means the inconsistent cost between adjacent pixels is constant,
+the model is called Ising model. We have done experiments on those
+models and the results are shown in Section~\ref{sec:exp}.
 \subsection{Inference}
 
 \subsection{Use of Scan Data}
 
 \section{Experiment}
+\label{sec:exp}
 The first experiment is done using GrabCut. As mentioned in previous section, we only use the distance transform image derived from laser point projections as an initialization for MRF in this case. The distance transform image is thresholded to form an initial labeling strategy for foreground and background. As a result, the extra information provided is not used across iterations. The result is shown in figure []. 
 
 Note that since we assigned equal cost to edges across the image, cars having similar color as the sky would be segmented as the background.
