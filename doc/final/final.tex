@@ -283,14 +283,32 @@ filter~\citep{Szeliski2010} to extract the edge-like features. The
 result image is resized back to the original image size. As each pixel
 now has a estimate how likely it is on the boundary, we use this
 information in our model, represented by \textbf{d} in
-Equation~\eqref{eq:energy}.
+Equation~\eqref{eq:energy}. The result of this process is shown in
+Figure~\ref{fig:sobel}.
 
 To initialize the labels, we do a distance
 transform~\citep{Borgefors1986Distance,Felzenszwalb2004Distance} on
 the scan point image, which is a black image with white points showing
-the projection of the scan points. Based on certain threshold, we can
+the projection of the scan points. The result of distance transform is
+shown in Figure~\ref{fig:dt}. Based on certain threshold, we can
 get a region estimated as background. Since this region will be
 refined in the algorithm, the threshold used doesn't matter much.
+
+\begin{figure}[h]
+\begin{center}
+\subfigure[]{
+\label{fig:sobel}
+\includegraphics[height=0.5\linewidth]{./fig/sobel_00_00.png}
+}
+\subfigure[]{
+\label{fig:dt}
+\includegraphics[height=0.5\linewidth]{./fig/dt_00_00.jpg}
+}
+\end{center}
+\caption{The use of the scan points. (a) Boundary of the Scan
+  Points. (b) Distance Transform of Scan Point image.}
+\label{fig:data_usage}
+\end{figure}
 
 \section{Experiment}
 \label{sec:exp}
