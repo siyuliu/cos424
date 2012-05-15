@@ -2,6 +2,7 @@
 \usepackage{nips12submit_e,times, color, amsmath}
 \usepackage{natbib}
 \usepackage[pdftex]{graphicx}
+\usepackage{subfigure}
 %\documentstyle[nips12submit_09,times,art10]{article} % For LaTeX 2.09
 
 
@@ -116,7 +117,7 @@ matrices. Then we can get images like Figure~\ref{fig-data_image}.
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[height=0.5\linewidth]{./fig/image_sample.png}
+\includegraphics[height=0.5\linewidth]{./fig/overlay_00_00.jpg}
 \end{center}
 \caption{An image with 3D points projected into it.}
 \label{fig-data_image}
@@ -131,7 +132,6 @@ between the background (the sky area) and foreground (all the objects
 appears in the image, including roads and buildings). The models and
 computing issue will be discussed in the methods section.
 
-
 \section{Related Work}
 As a common problem in vision, segmentation has been well studied in the past. There is a large literature on segmentation and clustering among which two main lines of methods are proposed previously, feature space clustering (e.g.~\citep{Comaniciu1997featurespace},~\citep{Comaniciu1999meanshift}) and graph-based approach (e.g.~\citep{Shi1997normalizedcuts},~\citep{Wu1993optimalgraph}). 
 
@@ -141,7 +141,7 @@ A natural approach is to model the observed feature vector using a Gaussian mixt
 
 Another branch of image segmentation algorithms is graph-based method. Instead of consider each pixel independently, we form a graph with each vertex representing an individual pixel and assign weights to edges according to some similarity measure. Then, the segments are determined by graph cuts.
 
-One naive approach would be to calcualte connected components. We could use algorithms like Kruskal or Prime to simple remove edges between dissimilar pixels. However, this method is not robust to stray links. Thus,~\citep{Felzenszwalb2004Efficient} introduced an improved version of Kruskal algorithm which takes in account the local variantion within each component. An alternative proposal is to formulate segmentation as a max-flow/min-cut problem. One typical example of S-T Min Cut algorithms is the normalized cut introduced by~\citep{Shi2000Normalized}. This method takes into account the partition size of each segment so as to avoid tiny regions. In a more sophesticated setting, Markov Random Field (MRF), which we chosed for this project, is often used to combine probabilistic modeling and graph cut in order to provide better result. The goal of learning MRFs is to minimize the objective function (a.k.a. the energy function) which describes both fitness and connectivity among neighborhood. Several training algorithms have been proposed over the years, Iterated Conditional Modes (ICM)~\citep{Besag1986statisticalanalysis} uses "greedy" strategy to find local minimum; Graph Cuts, two most popular ones, swap-move and expansion-move were introduced in~\citep{Boykov2001Fast}; Max-Product Loopy Belif Propagation (LBP)~\citep{Felzenszwalb2004Efficient} and~\citep{Freeman2000lowlevel}, a variant algorithm from the original belif propagation supporting loops in the graph; Tree-reweighted Message Passing desbribed in~\citep{Kolmogorov2006messagepassing}.
+One naive approach would be to calcualte connected components. We could use algorithms like Kruskal or Prime to simple remove edges between dissimilar pixels. However, this method is not robust to stray links. Thus,~\citet{Felzenszwalb2004Efficient} introduced an improved version of Kruskal algorithm which takes in account the local variantion within each component. An alternative proposal is to formulate segmentation as a max-flow/min-cut problem. One typical example of S-T Min Cut algorithms is the normalized cut introduced by~\citet{Shi2000Normalized}. This method takes into account the partition size of each segment so as to avoid tiny regions. In a more sophesticated setting, Markov Random Field (MRF), which we chose a variant version, Conditional Random Field (CRF), for this project, is often used to combine probabilistic modeling and graph cut in order to provide better result. The goal of learning MRFs is to minimize the objective function (a.k.a. the energy function) which describes both fitness and connectivity among neighborhood. Several training algorithms have been proposed over the years, Iterated Conditional Modes (ICM)~\citep{Besag1986statisticalanalysis} uses "greedy" strategy to find local minimum; Graph Cuts, two most popular ones, swap-move and expansion-move were introduced in~\citet{Boykov2001Fast}; Max-Product Loopy Belif Propagation (LBP)~\citep{Felzenszwalb2004Efficient} and~\citep{Freeman2000lowlevel}, a variant algorithm from the original belif propagation supporting loops in the graph; Tree-reweighted Message Passing desbribed in~\citet{Kolmogorov2006messagepassing}.
 
 \section{Methods}
 Based on the previous work, we merge several ideas in our
@@ -226,31 +226,64 @@ called GrabCut as in~\citep{Rother2004GrabCut}. When $\beta$ is 0,
 which means the inconsistent cost between adjacent pixels is constant,
 the model is called Ising model. We have done experiments on those
 models and the results are shown in Section~\ref{sec:exp}.
+
 \subsection{Inference}
 
 \subsection{Use of Scan Data}
 
 \section{Experiment}
 \label{sec:exp}
-The first experiment is done using GrabCut. As mentioned in previous section, we only use the distance transform image derived from laser point projections as an initialization for MRF in this case. The distance transform image is thresholded to form an initial labeling strategy for foreground and background. As a result, the extra information provided is not used across iterations. The result is shown in figure []. 
 
-Note that since we assigned equal cost to edges across the image, cars having similar color as the sky would be segmented as the background.
+The first experiment is done using GrabCut. As mentioned in previous section, we only use the distance transform image derived from laser point projections as an initialization for MRF in this case. The distance transform image is thresholded to form an initial labeling strategy for foreground and background. As a result, the extra information provided is not used across iterations. The result is shown in Figure~\ref{fig-grab-00_00}. 
 
-Having observed this drawback, we decided to vary the cut cost according to our initial estimation of the segments. Note that, assuming foreground objects got scanned more often than background, the natural boundaries would occur at the transition between dense and sparse areas of projected LiDAR points. Thus, in the second experiment, LaserCut, we prepross the distance transform by running simple edge detection algorithm (i.e. Sobel operator) to extract possible boundaries between foreground and background. Therefore, for regions within the potential boundaries, some color differences would be tolerated by assigning smaller weights before the corresponding term in the energy funciton. In contrast, for pixels close to potential boundaries, we intend to rely more on color differences via larger weights to refine the boundary curve. The result is shown in figure [].
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=0.5\linewidth]{./fig/overlay_00_00_grab.jpg}
+\end{center}
+\caption{Segmentation result with GrabCut.}
+\label{fig-grab-00_00}
+\end{figure}
+
+Note that since we assigned equal cost to edges across the image, cars and windows sharing the similar color as the sky would be segmented as the background.
+
+Having observed this drawback, we decided to vary the cut cost according to our initial estimation of the segments. Note that, assuming foreground objects got scanned more often than background, the natural boundaries would occur at the transition between dense and sparse areas of projected LiDAR points. Thus, in the second experiment, LaserCut, we prepross the distance transform by running simple edge detection algorithm (i.e. Sobel operator) to extract possible boundaries between foreground and background. Therefore, for regions within the potential boundaries, some color differences would be tolerated by assigning smaller weights before the corresponding term in the energy funciton. In contrast, for pixels close to potential boundaries, we intend to rely more on color differences via larger weights to refine the boundary curve. The result is shown in Figure~\ref{fig-laser-00_00}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=0.5\linewidth]{./fig/overlay_00_00_laser.jpg}
+\end{center}
+\caption{Segmentation result with LaserCut.}
+\label{fig-laser-00_00}
+\end{figure}
 
 Comparing to GrabCut model, we successfully eliminated the white cars in the front from the background.
 
-To further evaluate our model, we did another experiment on the same image with a widely used MRF model, Ising model. In this setting, color difference between neighboring pixels is completely ignored by assigning the same cost for connectivity to all edges in the MRF graph. The result is shown in figure [].
+To further evaluate our model, we did another experiment on the same image with a widely used MRF model, Ising model. In this setting, color difference between neighboring pixels is completely ignored by assigning the same cost for connectivity to all edges in the MRF graph. The result is shown in Figure~\ref{fig-ising-00_00}.
 
-Taking a close look at the boundary Ising model found, we observed that the foreground objects are outlined by a "margin" of the sky. This is probably due to we only used Gaussian mixture model to measure the clustering in color. Since there are white cars on the road, the GMM would intend to label part of the sky as the foreground due to larger threshold on distance transform image. However, smaller threshold values would result in labeling the white cars in the front to background initial, which would be generally hard to correct in later iteration under this model.
+\begin{figure}[h]
+\begin{center}
+\subfigure[Large threshold on initialization]{
+\label{fig-ising-large}
+\includegraphics[height=0.5\linewidth]{./fig/overlay_00_00_ising_large.jpg}
+}
+\subfigure[Small threshold on initialization]{
+\label{fig-ising-small}
+\includegraphics[height=0.5\linewidth]{./fig/overlay_00_00_ising_small.jpg}
+}
+\end{center}
+\caption{Segmentation result with Ising Model.}
+\label{fig-ising-00_00}
+\end{figure}
+
+Taking a close look at the boundary Ising model found, we observed that the foreground objects are outlined by a ``margin" of the sky. This is probably due to we only used Gaussian mixture model to measure the clustering in color. Since there are white cars on the road, the GMM would intend to label part of the sky as the foreground due to larger threshold~\ref{fig-ising-large} on distance transform image. However, smaller threshold~\ref{fig-ising-small} values would result in labeling the white cars in the front to background initial, which would be generally hard to correct in later iteration under this model.
 
 \section{Evaluation}
 
-In general, evaluating segmentation result is hard due to the absence of precise quantitative measurement without ground truth. In addition, there is another important issue centers around the use of energy to compare energy minimization algorithms. The goal in computer vision is not to compute the lowest energy but the most accurate one, besides computing the global minimum was shown to be NP-complete in general~\citep{Boykov2001Fast}. In the paper by~\citep{Szeliski2008Comparative}, a quantitative comparison between lowest energy achieved by different energy minimization algorithms and the energy calculated from ground truth provides experimental proof for this argument. Although one can argue that we could manually draw the boundaries for each image we used in this project, due to high resolution (1936 x 2592) and limited size of sample labling from different users we can account for given the time, the accuracy and unbiasness of the ground truth cannot be guaranteed.
+In general, evaluating segmentation result is hard due to the absence of precise quantitative measurement without ground truth. In addition, there is another important issue centers around the use of energy to compare energy minimization algorithms. The goal in computer vision is not to compute the lowest energy but the most accurate one, besides computing the global minimum was shown to be NP-complete in general~\citep{Boykov2001Fast}. In the paper by~\citet{Szeliski2008Comparative}, a quantitative comparison between lowest energy achieved by different energy minimization algorithms and the energy calculated from ground truth provides experimental proof for this argument. Although one can argue that we could manually draw the boundaries for each image we used in this project, due to high resolution (1936 x 2592) and limited size of sample labling from different users we can account for given the time, the accuracy and unbiasness of the ground truth cannot be guaranteed.
 
 As an alternative, we decided to conduct a comparison study among the three experiments we did mentioned in previous section. The best model as well as the final model we have is LaserCut which has the advantage of adaptiveness of initial guess through out all iterations. As we discussed before, comparing to GrabCut model, LaserCut successfully classified the cars with similar color as the background as part of the foreground. This observation suggests the effectiveness of adaptively using extra information acquired from LiDAR scan. On the other hand, comparing to Ising model, LaserCut could provide more complicated and accurate boundary between foreground and background, which indicates the effectiveness of separation on color differences when close to the boundary.
 
-Granted, there are still areas near the boundary being mislabelled, for instance, some leaves of the tree in figure []. It is generally hard to determine the exact bounday of such complicated foreground object. Even when we have captured images with such high resolution, it is still far from certain that all the details of objects far back to the scene can be accurately preserved. Moreover, even though we can somehow manage to obtain all the details in the scene, the correctness of boundaries around complicated objects like trees would be rather subjective to different people.
+Granted, there are still areas near the boundary being mislabelled, for instance, some leaves of the tree in Figure~\ref{fig-laser-00_00}. It is generally hard to determine the exact bounday of such complicated foreground object. Even when we have captured images with such high resolution, it is still far from certain that all the details of objects far back to the scene can be accurately preserved. Moreover, even though we can somehow manage to obtain all the details in the scene, the correctness of boundaries around complicated objects like trees would be rather subjective to different people.
 
 Therefore, in spite of the fact that most of the model evaluation is based on visual check in this project, we hope our observations and analysis could make a plausible case for the advantage of LaserCut model over the others.
 
@@ -259,9 +292,9 @@ Therefore, in spite of the fact that most of the model evaluation is based on vi
 Through careful study on the resulting segmentation of our approach,
 we learnt several things about the algorithm.
 For one thing, the algorithm produces a good approximation to the
-\emph{true} boundary between``foreground'' and``background''. 
-In figure [], the margin of ``background'' is curvy and very close to
-the true boundary between green leaves and sky. From the distance
+\emph{true} boundary between foreground and background. 
+In Figure~\ref{fig-laser-00_00}, the curve along the boundary is highly curvy and very close to
+the truth between green leaves and sky. From the distance
 data, we can see there are not many ``leaves'' pixels with distance,
 therefore we conjecture that the color feature plays an important role
 in delimiting the boundary.
@@ -269,27 +302,63 @@ For the other thing, the algorithm achieves balance between the
 influence of distance data, which is used to generate inital states,
 and the influence of color features, which is used to refine the
 segmentation. 
-For example, in figure [], although the white cars have similar color
-to that of sky, they are not considered as``background''.  
+For example, in Figure~\ref{fig-laser-00_00}, although the white cars have similar color
+to that of sky, they are not considered as background.  
 Another example is that some sky pixels in the image are classified
-as``background'', depite the dataset suggests that they have finite
+as background, depite the dataset suggests that they have finite
 distance to the camera.  
 These two examples show that we are able to use color feature to fix
 minor errors in the distance data while still maintaining most of
 status generated by the distance data.
 
 Our future work will focus on the following two aspects.
-First, the ``background'' pixels in our experiment images have very
+First, the background pixels in our experiment images have very
 similar color. This fact greatly helps segmentation as we can put much
 weight on the color feature to infer the labels of pixels. In the
 future, we want to incoporate images with more colorful
 background. To do segmentation on such images, we may have to
-introduce new factors to model ``background'' and ``foreground''.
+introduce new factors to model background and foreground.
 The other aspect is to do the general image segmentation. That is,
 segment the image into multi-layer. At present, we only use whether
 the pixel has a finite distance number or not. As we take the actual
 distance value into account, we can segement the images into several
 layers, with pixels in the same layers have close distance value.
+
+\section{More Results}
+We also did a comparison study on other images to further evaluate our algorithm. 
+
+\begin{figure}[h]
+\begin{center}
+\subfigure[GrabCut]{
+\label{fig-gc_02_02}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_02_02_grab.jpg}
+}
+\subfigure[Ising Model]{
+\label{fig-is_02_02}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_02_02_ising.jpg}
+}
+\subfigure[LaserCut]{
+\label{fig-lc_02_02}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_02_02_laser.jpg}
+}
+\subfigure[GrabCut]{
+\label{fig-gc_14_04}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_14_04_grab.jpg}
+}
+\subfigure[Ising Model]{
+\label{fig-is_14_04}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_14_04_ising.jpg}
+}
+\subfigure[LaserCut]{
+\label{fig-lc_14_04}
+\includegraphics[height=0.4\linewidth]{./fig/overlay_14_04_laser.jpg}
+}
+\end{center}
+\caption{Comparison study on other images.}
+\label{fig-02_02}
+\end{figure}
+
+As we argued before, our algorithm would usually produce a more complicated yet cleaner bounary between forground and background over ther other two.
 
 \bibliography{final}
 \bibliographystyle{abbrvnat}

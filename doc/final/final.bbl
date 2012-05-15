@@ -1,0 +1,116 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Besag(1986)]{Besag1986statisticalanalysis}
+J.~Besag.
+\newblock On the statistical analysis of dirty pictures (with discussion).
+\newblock \emph{Journal of Royal Statistical Society, Series B}, 48\penalty0
+  (3):\penalty0 259--302, 1986.
+
+\bibitem[Boykov and Lea(2006)]{Boykov2006graph}
+Y.~Boykov and G.~F. Lea.
+\newblock {Graph Cuts and Efficient N-D Image Segmentation}.
+\newblock \emph{Int. J. Comput. Vision}, 70\penalty0 (2):\penalty0 109--131,
+  Nov. 2006.
+\newblock ISSN 0920-5691.
+
+\bibitem[Boykov et~al.(2001)Boykov, Veksler, and Zabih]{Boykov2001Fast}
+Y.~Boykov, O.~Veksler, and R.~Zabih.
+\newblock {Fast approximate energy minimization via graph cuts}.
+\newblock \emph{Pattern Analysis and Machine Intelligence, IEEE Transactions
+  on}, 23\penalty0 (11):\penalty0 1222--1239, Nov. 2001.
+\newblock ISSN 0162-8828.
+
+\bibitem[Carson et~al.(2002)Carson, Belongie, Greenspan, and
+  Malik]{Carson2002bolbworld}
+C.~Carson, S.~Belongie, H.~Greenspan, and J.~Malik.
+\newblock Blobworld: Image segmentation using expectation-maximization and its
+  application to image querying.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 24\penalty0 (8):\penalty0 1026--1038, 2002.
+
+\bibitem[Comaniciu and Meer(1997)]{Comaniciu1997featurespace}
+D.~Comaniciu and P.~Meer.
+\newblock Robust analysis of feature spaces: color image segmentation.
+\newblock \emph{Proceedings of IEEE Conference on Computer Vision and Pattern
+  Recognition}, pages 750--755, 1997.
+
+\bibitem[Comaniciu and Meer(1999)]{Comaniciu1999meanshift}
+D.~Comaniciu and P.~Meer.
+\newblock Mean shift analysis and application.
+\newblock \emph{Proceedings of IEEE Conference on Computer Vision and Pattern
+  Recognition}, pages 1197--1203, 1999.
+
+\bibitem[Comaniciu and Meer(2002)]{Comaniciu2002robustapproach}
+D.~Comaniciu and P.~Meer.
+\newblock Mean shift: A robust approach toward feature space analysis.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 24:\penalty0 603--619, 2002.
+
+\bibitem[Felzenszwalb and Huttenlocher(2004)]{Felzenszwalb2004Efficient}
+P.~F. Felzenszwalb and D.~R. Huttenlocher.
+\newblock {Efficient belief propagation for early vision}.
+\newblock In \emph{Computer Vision and Pattern Recognition, 2004. CVPR 2004.
+  Proceedings of the 2004 IEEE Computer Society Conference on}, volume~1, pages
+  I--261--I--268 Vol.1. IEEE, June 2004.
+\newblock ISBN 0-7695-2158-4.
+
+\bibitem[Freeman et~al.(2000)Freeman, Pasztor, and
+  Carmichael]{Freeman2000lowlevel}
+W.~Freeman, E.~Pasztor, and O.~Carmichael.
+\newblock Learning low-level vision.
+\newblock \emph{International Journal of Computer Vision}, 40\penalty0
+  (1):\penalty0 25--47, 2000.
+
+\bibitem[Kass et~al.(1988)Kass, Witkin, and Terzopoulos]{Kass1988snakes}
+M.~Kass, A.~Witkin, and D.~Terzopoulos.
+\newblock Snakes: Active contour models.
+\newblock \emph{INTERNATIONAL JOURNAL OF COMPUTER VISION}, 1\penalty0
+  (4):\penalty0 321--331, 1988.
+
+\bibitem[Kolmogorov(2006)]{Kolmogorov2006messagepassing}
+V.~Kolmogorov.
+\newblock Covergent tree-reweighted message passing for energy minimization.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 28\penalty0 (10):\penalty0 1568--1583, 2006.
+
+\bibitem[Lowe(2004)]{Lowe2004sift}
+D.~G. Lowe.
+\newblock Distinctive image features from scale-invariant features.
+\newblock \emph{International Journal of Computer Vision}, 2004.
+
+\bibitem[Shi and Malik(1997)]{Shi1997normalizedcuts}
+J.~Shi and J.~Malik.
+\newblock Normalized cuts and image segmentation.
+\newblock \emph{Proceedings of IEEE Conference on Computer Vision and Pattern
+  Recognition}, pages 731--737, 1997.
+
+\bibitem[Shi and Malik(2000)]{Shi2000Normalized}
+J.~Shi and J.~Malik.
+\newblock {Normalized cuts and image segmentation}.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 22\penalty0 (8):\penalty0 888--905, Aug. 2000.
+\newblock ISSN 01628828.
+
+\bibitem[Szeliski et~al.(2008)Szeliski, Zabih, Scharstein, Veksler, Kolmogorov,
+  Agarwala, Tappen, and Rother]{Szeliski2008Comparative}
+R.~Szeliski, R.~Zabih, D.~Scharstein, O.~Veksler, V.~Kolmogorov, A.~Agarwala,
+  M.~Tappen, and C.~Rother.
+\newblock {A Comparative Study of Energy Minimization Methods for Markov Random
+  Fields with Smoothness-Based Priors}.
+\newblock \emph{Pattern Analysis and Machine Intelligence, IEEE Transactions
+  on}, 30\penalty0 (6):\penalty0 1068--1080, June 2008.
+\newblock ISSN 0162-8828.
+
+\bibitem[Wu and Leahy(1993)]{Wu1993optimalgraph}
+Z.~Wu and R.~Leahy.
+\newblock An optimal graph theoretic approach to data clustering: Theory and
+  its application to image segmentation.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 11:\penalty0 1101--1113, 1993.
+
+\end{thebibliography}
