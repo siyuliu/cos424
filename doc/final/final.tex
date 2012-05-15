@@ -179,7 +179,7 @@ encourage identical labeling. Our proposed model is
 \begin{align}
 \mathbf{E}(\mathbf{c}, \mathbf{d},\mathbf{k}, \mathbf{\theta},
 \mathbf{z}) &= U(\mathbf{c},\mathbf{k}, \mathbf{\theta}, \mathbf{z}) +
-V(\mathbf{c}, \mathbf{d}, \mathbf{z}) \\
+V(\mathbf{c}, \mathbf{d}, \mathbf{z}) \label{eq:energy}\\
 U(\mathbf{c},\mathbf{k}, \mathbf{\theta}, \mathbf{z}) &=
 \sum_{i=0}^{i<N} D(c_i, k_i, \theta, z_i) \\
 D(c_i, k_i, \theta, z_i) &= -\log \pi_{k_i}^{z_i} + (c_i -
@@ -192,7 +192,8 @@ V(\mathbf{c}, \mathbf{d}, \mathbf{z}) &= \gamma \sum_{(i, j) \in
 \textbf{d} is  how likely a given pixel is on the boundary from
 scan. It will be discussed further later in this section.
 \textbf{k} is assigned GMM cluster for each pixel.
-\textbf{z} is latent variables labeling foreground and background where $z=0$ means foreground and $z=1$ background.
+\textbf{z} is latent variables labeling foreground and background
+where $z=0$ means foreground and $z=1$ background.
 $\pi_k^z$ is mixture weighting coefficients.
 $\mu_k^z$ is the mean of the $k$th Gaussian component.
 $\Sigma_k^z$ is the covariance matrix of the $k$th Gaussian component.
@@ -221,6 +222,21 @@ labeling. In our case, we consider the color image instead of gray
 image and so the different difference of pixel colors are measured by
 L2 norm.
 
+It can be shown~\citep{Geman1984Stochastic, Li2001Markov} that the
+energy function we defined to represent the CRF can corresponds to a
+Gibbs distribution uniquely. So by minimizing the energy function, we
+are actually seeking the Maximum Likelihood solution to the Gibbs
+distribution. The graphical representation of our model in color is
+shown in Figure~\ref{fig:mrf_model}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[height=0.5\linewidth]{./fig/mrf_model.pdf}
+\end{center}
+\caption{The graphical representation of our model in color}
+\label{fig:mrf_model}
+\end{figure}
+
 It is worth pointing out that when \textbf{d} is always 1. The model is
 called GrabCut as in~\citep{Rother2004GrabCut}. When $\beta$ is 0,
 which means the inconsistent cost between adjacent pixels is constant,
@@ -228,8 +244,53 @@ the model is called Ising model. We have done experiments on those
 models and the results are shown in Section~\ref{sec:exp}.
 
 \subsection{Inference}
-
+As mentioned, we use EM algorithm to estimate the Gaussian mixtures in
+given the pixel labels. At the end of each iteration, we minimize the
+energy function~\eqref{eq:energy} to update the pixel labels. There
+are several ways to infer the labels of pixels based on our model. The
+traditional way is Monte Carlo Markov Chain
+method~\citep{Bishop2006Pattern}. There are also some other inference
+methods proposed during the last several
+decades~\citep{Szeliski2008Comparative}. However, most of them are
+approximate methods and don't guarantee an globally optimal
+solution.~\citet{Boykov2001Fast} and~\citet{Boykov2006} argues that for the binary
+segmentation, if the energy function has the submodular property, the
+optimal solution can be got by minimum graph cut. Fortunately, when we
+constructing our energy function, we make sure that the submodular
+property is satisfied. Therefore, we solve Maximum flow, the dual
+problem of minimum cut, to minimize the energy function and update the
+pixel labels at the end of each EM iteration.
 \subsection{Use of Scan Data}
+
+As you can see in Figure~\ref{fig-data_image}, the scan points are not
+scattered in the image evenly in the foreground and therefore it is
+hard to extract some robust statistics to describe the foreground or
+the boundary. One idea is using bins around a pixel to describe the
+feature of it. To be specific, given the position of a pixel, we
+consider all the scan points within certain radius. The circle is
+divided in angular direction to get the bins. Then the feature of the
+pixel is how many pizza shape bins contain scan points. Although it is
+a nice way to describe the scan point description around a pixel, it
+is hard to find efficient way to calculate it for every
+pixel.
+
+We later realized that using bins is equivalent to downsampling the
+image. What's more, the region of most interest is the boundary
+between the foreground and background. Therefore, we propose a new
+methods to extract the scan information from the scan points. First,
+we downsample the image and then apply Sobel
+filter~\citep{Szeliski2010} to extract the edge-like features. The
+result image is resized back to the original image size. As each pixel
+now has a estimate how likely it is on the boundary, we use this
+information in our model, represented by \textbf{d} in
+Equation~\eqref{eq:energy}.
+
+To initialize the labels, we do a distance
+transform~\citep{Borgefors1986Distance,Felzenszwalb2004Distance} on
+the scan point image, which is a black image with white points showing
+the projection of the scan points. Based on certain threshold, we can
+get a region estimated as background. Since this region will be
+refined in the algorithm, the threshold used doesn't matter much.
 
 \section{Experiment}
 \label{sec:exp}
