@@ -60,13 +60,13 @@ some pixel may be mapped to a wrong real object resulting in a wrong
 distance number. Therefore, the algorithm should include procedures
 that help fix the inherent errors of data. 
 
-Considering the defects of distance data, we plan to only use it to
+We plan to use the distance data to first
 generate the initial states of pixels, i.e,
  whether it belongs to ``foreground'' or not. Based on the inital
  states, we'll iteratively refine the segmentation following the
- traditional Expectation Maximization process. To do the refinement,
+ modified Expectation Maximization process. To do the refinement,
  we'll use Markov Random Fields to calculate the log-likelihood of a
- pixel, taking the information of the 8 pixels around it into account.
+ pixel, taking the information of the 4 pixels around it into account.
 
 We believe our approach is more accurate than previous work. The additional 
 distance data is a good indicator about which group a pixel belongs to, 
@@ -276,7 +276,8 @@ It is worth pointing out that when \textbf{d} is always 1. The model is
 called GrabCut as in~\citep{Rother2004GrabCut}. When $\beta$ is 0,
 which means the inconsistent cost between adjacent pixels is constant,
 the model is called Ising model. We have done experiments on those
-models and the results are shown in Section~\ref{sec:exp}.
+models and the results are shown in Section~\ref{sec:exp}. We call our
+model LaserCut in the experiment section.
 
 \subsection{Inference}
 As mentioned, we use EM algorithm to estimate the Gaussian mixtures in
