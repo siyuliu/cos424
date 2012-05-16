@@ -32,28 +32,13 @@ Siyu Liu\\
 
 \section{Introduction}
 
-\subsection{Motivation}
+%\subsection{Background}
 
 In computer vision, ``Image Segmentation'' is a process of partitioning an
 image into several pixel groups. It is typically used to locate
 objects and boundaries in an image. Particularly, ``Binary Separation'' -
 how to partition an image into two segments: ``foreground''
  and ``background'' is of special interest. 
-
-% Earlier techniques focused on finding the boundary curves between the
-% objects and background. The algorithms include
-% snakes~\citep{Kass1988snakes}, active
-% contours~\citep{Isard1998condensation} and so on. A recent new
-% approach by~\citet{Boykov2006graph} relies on manual sketches on the
-% original image. 
-% It requires a user to draw strokes of different color in the
-% foreground and background area of the image. Then, the algorithm
-% solves segmentation problem based on this extra knowledge. However,
-% one obvious problem with this approach is that it requires
-% additional manual efforts, which limits the number of images that
-% can be processed. Moreover, as the strokes are roughly drawn, it
-% introduces some uncertain errors when the boundary is not quite
-% distingushiable.
 
 Earlier techniques are either based on boundary features
 ~\citep{Kass1988snakes} or manual sketches
@@ -92,7 +77,66 @@ segmentation decision is not likely to be misled by errors in distance
 data, since it will do iterative refinement based on the pixel's local
 neighbor information.
 
-\subsection{Data}
+\section{Related Work}
+As a common problem in computer vision, segmentation has been well
+studied in the past. There is a large literature on segmentation and
+clustering, among which two main lines of methods are proposed
+previously, feature space clustering
+(e.g.~\citep{Comaniciu1997featurespace},~\citep{Comaniciu1999meanshift})
+and graph-based approach
+(e.g.~\citep{Shi1997normalizedcuts},~\citep{Wu1993optimalgraph}).
+Besides these methods, which only relies on the image
+information , researchers have proposed new segmentation algorithm
+that use rough manual labelling to do more accurate segmentation. We
+will introduce these three methods briefly.
+
+
+In feature space clustering, local features, such as low pass filter
+response, SIFT~\citep{Lowe2004sift}, etc., are firstly extracted from
+the given image. For color images, color information is often
+included. Then those features are concatenated to form a vector as a
+descriptor for each pixel. In order to segment the image, we might
+seek a clustering of feature vectors observed in the image. A compact
+region of image with distinct feature would be expected to have a
+corresponding high density area in the feature
+space~\citep{Boykov2006graph}. 
+
+
+% A natural approach is to model the observed feature vector using a
+% Gaussian mixture model (GMM)~\citep{Carson2002bolbworld}. For a
+% pre-determined number of clusters \textit{K}, the parameters can be
+% fitted by Maximum Likelihood using EM algorithm. In addition,
+% \textit{K} can be chosen using penalized likelihood (a.k.a. minimum
+% description length), Baysian information criterion (BIC) and other
+% model selection mechanisms. In addition, other variations are proposed
+% by replacing GMM with K-means or low dimensional representation of the
+% covariance matrix via matrix factorization. On the other hand, to
+% avoid extra step of determining the number of clusters for the methods
+% mentioned above, a non-parametric model based on kernel density
+% estimation is proposed as an alternative. Mean-shift segmentation
+% algorithm~\citep{Comaniciu2002robustapproach} considers the
+% probability density of feature vectors obtained from a given image. An
+% iterative update on the mean-shift equation is used to find the
+% segmentation labels. 
+
+
+Another branch of image segmentation algorithms is graph-based
+method. Instead of consider each pixel independently, we form a graph
+with each vertex representing an individual pixel and assign weights
+to edges according to some similarity measure. Then, the segments are
+determined by graph cuts.
+
+
+%One naive approach would be to calcualte connected components. We could use algorithms like Kruskal or Prime to simple remove edges between dissimilar pixels. However, this method is not robust to stray links. Thus,~\citet{Felzenszwalb2004Efficient} introduced an improved version of Kruskal algorithm which takes in account the local variantion within each component. An alternative proposal is to formulate segmentation as a max-flow/min-cut problem. One typical example of S-T Min Cut algorithms is the normalized cut introduced by~\citet{Shi2000Normalized}. This method takes into account the partition size of each segment so as to avoid tiny regions. In a more sophesticated setting, Markov Random Field (MRF), which we chose a variant version, Conditional Random Field (CRF), for this project, is often used to combine probabilistic modeling and graph cut in order to provide better result. The goal of learning MRFs is to minimize the objective function (a.k.a. the energy function) which describes both fitness and connectivity among neighborhood. Several training algorithms have been proposed over the years, Iterated Conditional Modes (ICM)~\citep{Besag1986statisticalanalysis} uses "greedy" strategy to find local minimum; Graph Cuts, two most popular ones, swap-move and expansion-move were introduced in~\citet{Boykov2001Fast}; Max-Product Loopy Belif Propagation (LBP)~\citep{Felzenszwalb2004Efficient} and~\citep{Freeman2000lowlevel}, a variant algorithm from the original belif propagation supporting loops in the graph; Tree-reweighted Message Passing desbribed in~\citet{Kolmogorov2006messagepassing}.
+
+
+A recent new approach 
+by~\citet{Boykov2006graph} relies on manual sketches on the original
+ image. It requires a user to draw strokes of different color in the foreground 
+and background area of the image. Then, the algorithm solves segmentation
+problem based on this extra knowledge. 
+
+\section{Data}
 
 We got our data from Google street view team and preprocessed it for
 use in our project. The data was collected by a car equiped
@@ -132,16 +176,7 @@ between the background (the sky area) and foreground (all the objects
 appears in the image, including roads and buildings). The models and
 computing issue will be discussed in the methods section.
 
-\section{Related Work}
-As a common problem in vision, segmentation has been well studied in the past. There is a large literature on segmentation and clustering among which two main lines of methods are proposed previously, feature space clustering (e.g.~\citep{Comaniciu1997featurespace},~\citep{Comaniciu1999meanshift}) and graph-based approach (e.g.~\citep{Shi1997normalizedcuts},~\citep{Wu1993optimalgraph}). 
 
-In feature sapce clustering, local features, such as low pass filter response, SIFT~\citep{Lowe2004sift}, etc., are firstly extracted from the given image. For color images, color information is often included. Then those features are concatenated to form a vector as a descriptor for each pixel. In order to segment the image, we might seek a clustering of feature vectors observed in the image. A compact region of image with distinct feature would be expected to have a corresponding high density area in the feature space. 
-
-A natural approach is to model the observed feature vector using a Gaussian mixture model (GMM)~\citep{Carson2002bolbworld}. For a pre-determined number of clusters \textit{K}, the parameters can be fitted by Maximum Likelihood using EM algorithm. In addition, \textit{K} can be chosen using penalized likelihood (a.k.a. minimum description length), Baysian information criterion (BIC) and other model selection mechanisms. In addition, other variations are proposed by replacing GMM with K-means or low dimensional representation of the covariance matrix via matrix factorization. On the other hand, to avoid extra step of determining the number of clusters for the methods mentioned above, a non-parametric model based on kernel density estimation is proposed as an alternative. Mean-shift segmentation algorithm~\citep{Comaniciu2002robustapproach} considers the probability density of feature vectors obtained from a given image. An iterative update on the mean-shift equation is used to find the segmentation labels. 
-
-Another branch of image segmentation algorithms is graph-based method. Instead of consider each pixel independently, we form a graph with each vertex representing an individual pixel and assign weights to edges according to some similarity measure. Then, the segments are determined by graph cuts.
-
-One naive approach would be to calcualte connected components. We could use algorithms like Kruskal or Prime to simple remove edges between dissimilar pixels. However, this method is not robust to stray links. Thus,~\citet{Felzenszwalb2004Efficient} introduced an improved version of Kruskal algorithm which takes in account the local variantion within each component. An alternative proposal is to formulate segmentation as a max-flow/min-cut problem. One typical example of S-T Min Cut algorithms is the normalized cut introduced by~\citet{Shi2000Normalized}. This method takes into account the partition size of each segment so as to avoid tiny regions. In a more sophesticated setting, Markov Random Field (MRF), which we chose a variant version, Conditional Random Field (CRF), for this project, is often used to combine probabilistic modeling and graph cut in order to provide better result. The goal of learning MRFs is to minimize the objective function (a.k.a. the energy function) which describes both fitness and connectivity among neighborhood. Several training algorithms have been proposed over the years, Iterated Conditional Modes (ICM)~\citep{Besag1986statisticalanalysis} uses "greedy" strategy to find local minimum; Graph Cuts, two most popular ones, swap-move and expansion-move were introduced in~\citet{Boykov2001Fast}; Max-Product Loopy Belif Propagation (LBP)~\citep{Felzenszwalb2004Efficient} and~\citep{Freeman2000lowlevel}, a variant algorithm from the original belif propagation supporting loops in the graph; Tree-reweighted Message Passing desbribed in~\citet{Kolmogorov2006messagepassing}.
 
 \section{Methods}
 Based on the previous work, we merge several ideas in our
@@ -156,13 +191,13 @@ to the isolation between adjacent pixels in the Gaussian model, it is
 easy to imagine that the output of the binary classification will be
 very noisy in the sense that the adjacent pixels will have different
 labels although they have similar colors and belong to the same object
-visually. To solve this problem, we use Markov random field(MRF) model to
-constraint the relation between the labels of adjacent pixels. Also,
-we use conditional random field(CRF) model to adapt this relation to
-the difference of the pixel colors and therefore the model becomes
-more flexible. Also, we explore various ways to utilize our laser
-data. In the following subsections, we will discuss parts of our model
-and elaborate how we use the scan data.
+visually. To solve this problem, we use \emph{Markov Random
+  Field}(MRF) model to constraint the relation between the labels of
+adjacent pixels. Also, we use conditional random field(CRF) model to
+adapt this relation to the difference of the pixel colors and
+therefore the model becomes more flexible. Also, we explore various
+ways to utilize our laser data. In the following subsections, we will
+discuss parts of our model and elaborate how we use the scan data.
 \subsection{Gaussian Mixture Model}
 The foreground and background shall have different color
 characteristics. We use Gaussian Mixture Model to summarize the colors
@@ -360,36 +395,36 @@ Taking a close look at the boundary Ising model found, we observed that the fore
 
 In general, evaluating segmentation result is hard due to the absence of precise quantitative measurement without ground truth. In addition, there is another important issue centers around the use of energy to compare energy minimization algorithms. The goal in computer vision is not to compute the lowest energy but the most accurate one, besides computing the global minimum was shown to be NP-complete in general~\citep{Boykov2001Fast}. In the paper by~\citet{Szeliski2008Comparative}, a quantitative comparison between lowest energy achieved by different energy minimization algorithms and the energy calculated from ground truth provides experimental proof for this argument. Although one can argue that we could manually draw the boundaries for each image we used in this project, due to high resolution (1936 x 2592) and limited size of sample labling from different users we can account for given the time, the accuracy and unbiasness of the ground truth cannot be guaranteed.
 
-As an alternative, we decided to conduct a comparison study among the three experiments we did mentioned in previous section. The best model as well as the final model we have is LaserCut which has the advantage of adaptiveness of initial guess through out all iterations. As we discussed before, comparing to GrabCut model, LaserCut successfully classified the cars with similar color as the background as part of the foreground. This observation suggests the effectiveness of adaptively using extra information acquired from LiDAR scan. On the other hand, comparing to Ising model, LaserCut could provide more complicated and accurate boundary between foreground and background, which indicates the effectiveness of separation on color differences when close to the boundary.
+As an alternative, we decided to conduct a comparison study among the three experiments we did mentioned in previous section. The best model we have is LaserCut which has the advantage of adaptiveness of initial guess through out all iterations. As we discussed before, comparing to GrabCut model, LaserCut successfully classified the cars with similar color as the background as part of the foreground. This observation suggests the effectiveness of adaptively using extra information acquired from LiDAR scan. On the other hand, comparing to Ising model, LaserCut could provide more complicated and accurate boundary between foreground and background, which indicates the effectiveness of separation on color differences when close to the boundary.
 
 Granted, there are still areas near the boundary being mislabelled, for instance, some leaves of the tree in Figure~\ref{fig-laser-00_00}. It is generally hard to determine the exact bounday of such complicated foreground object. Even when we have captured images with such high resolution, it is still far from certain that all the details of objects far back to the scene can be accurately preserved. Moreover, even though we can somehow manage to obtain all the details in the scene, the correctness of boundaries around complicated objects like trees would be rather subjective to different people.
 
 Therefore, in spite of the fact that most of the model evaluation is based on visual check in this project, we hope our observations and analysis could make a plausible case for the advantage of LaserCut model over the others.
 
-\section{Conclusion and Future Work}
+\section{Lesson Learnt}
+ Through careful study on the resulting segmentation of our approach,
+ we learnt several things about the algorithm.
+ For one thing, color feature helps to produce a good approximation to the
+ \emph{true} boundary between foreground and background. 
+ In Figure~\ref{fig-laser-00_00}, the curve of ``background'' is very close to
+ the truth boundary between green leaves and sky. From the distance
+ data, we can see there are not many ``leaves'' pixels with
+ distance, therefore we conjecture that the color feature plays an
+ important role in delimiting the boundary.
+ For the other thing, the algorithm achieves balance between the
+ influence of distance data, which is used to generate inital states,
+ and the influence of color features, which is used to refine the
+ segmentation. 
+ For example, in Figure~\ref{fig-laser-00_00}, although the white cars have similar color
+ to that of sky, they are not considered as background.  
+ Another example is that some sky pixels in the image are classified
+ as background, depite the dataset suggests that they have finite
+ distance to the camera.  
+ These two examples show that we are able to use color feature to fix
+ minor errors in the distance data while still maintaining most of
+ status generated by the distance data.
 
-Through careful study on the resulting segmentation of our approach,
-we learnt several things about the algorithm.
-For one thing, color feature helps to produce a good approximation to the
-\emph{true} boundary between foreground and background. 
-In Figure~\ref{fig-laser-00_00}, the curve of ``background'' is very close to
-the truth boundary between green leaves and sky. From the distance
-data, we can see there are not many ``leaves'' pixels with distance,
-therefore we conjecture that the color feature plays an important role
-in delimiting the boundary.
-For the other thing, the algorithm achieves balance between the
-influence of distance data, which is used to generate inital states,
-and the influence of color features, which is used to refine the
-segmentation. 
-For example, in Figure~\ref{fig-laser-00_00}, although the white cars have similar color
-to that of sky, they are not considered as background.  
-Another example is that some sky pixels in the image are classified
-as background, depite the dataset suggests that they have finite
-distance to the camera.  
-These two examples show that we are able to use color feature to fix
-minor errors in the distance data while still maintaining most of
-status generated by the distance data.
-
+\section {Future Work}
 Our future work will focus on the following two aspects.
 First, the background pixels in our experiment images have very
 similar color. This fact greatly helps segmentation as we can put much
